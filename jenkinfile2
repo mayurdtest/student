@@ -1,0 +1,31 @@
+pipeline {
+    agent {
+        label 'label2'
+    }
+
+  stages {
+
+    stage('Clone code on node2') {
+      steps {
+        sh '''
+          if [ -d "student" ]; then
+            rm -rf student
+          fi
+
+          git clone https://github.com/Abhijeet4373/student.git
+        '''
+      }
+    }
+    
+    stage('Deploy to Kubernetes') {
+        steps {
+            script {
+		    sh 'cd student && kubectl delete -f deployment.yaml'
+                sh 'cd student && kubectl apply -f deployment.yaml'
+		    sh 'cd student && kubectl apply -f service.yaml'
+            }   
+        }
+    }
+
+}
+}
